@@ -1,14 +1,15 @@
-use crate::types::{Mod, ModVersion};
+use crate::types::{MCVersion, Mod, ModRelease};
 
-fn parse_version(value: serde_json::Value) -> anyhow::Result<ModVersion> {
-    Ok(ModVersion {
-        mc_versions: serde_json::from_value(value["game_versions"].clone())?,
-        mod_version: serde_json::from_value(value["name"].clone())?,
+fn parse_version(value: serde_json::Value) -> anyhow::Result<ModRelease> {
+    let mc_versions: Vec<String> = serde_json::from_value(value["game_versions"].clone())?;
+    Ok(ModRelease {
+        mc_versions: mc_versions.into_iter().map(|s| MCVersion::new(&s)).collect(),
+        release: serde_json::from_value(value["name"].clone())?,
         loaders: serde_json::from_value(value["loaders"].clone())?,
     })
 }
 
-pub fn check_versions(m: &Mod) -> anyhow::Result<Vec<ModVersion>> {
+pub fn check_versions(m: &Mod) -> anyhow::Result<Vec<ModRelease>> {
     let url = format!("https://api.modrinth.com/v2/project/{}/version", m.name);
     let body = reqwest::blocking::get(&url)?.text()?;
     let versions: Vec<serde_json::Value> = serde_json::from_str(&body)?;

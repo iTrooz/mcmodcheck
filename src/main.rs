@@ -1,11 +1,14 @@
+use clap::Parser;
+
 use crate::types::ModType;
 use std::error::Error;
 use std::fs;
 
+mod cli;
 mod logging;
+pub mod logic;
 mod modrinth;
 pub mod types;
-pub mod logic;
 
 fn parse_mods(path: &str) -> anyhow::Result<Vec<types::Mod>> {
     let data = fs::read_to_string(path)?;
@@ -33,7 +36,10 @@ fn parse_mods(path: &str) -> anyhow::Result<Vec<types::Mod>> {
 fn main() -> Result<(), Box<dyn Error>> {
     logging::setup();
 
-    let mods = parse_mods("mods.txt")?;
+    let cli = cli::Cli::parse();
+
+    let mods = parse_mods(&cli.src)?;
+
     for mod_item in mods {
         match modrinth::check_versions(&mod_item) {
             Ok(versions) => log::info!("Versions for mod '{}': {:?}", mod_item.name, versions),
