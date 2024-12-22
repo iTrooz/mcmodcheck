@@ -5,6 +5,7 @@ use std::fs;
 mod logging;
 mod modrinth;
 pub mod types;
+pub mod logic;
 
 fn parse_mods(path: &str) -> anyhow::Result<Vec<types::Mod>> {
     let data = fs::read_to_string(path)?;
