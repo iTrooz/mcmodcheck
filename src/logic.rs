@@ -25,7 +25,7 @@ fn extract_sorted_unique_mc_versions(releases: &Vec<(Mod, ModRelease)>) -> Vec<M
 
 /// Find the highest MC version that satisfies the constraints for all mods
 pub fn find_best_mc_version(mods: Vec<ModAndReleases>, c: Constraints) -> Option<MCVersion> {
-    let mut matching_releases: Vec<_> = get_flat_releases(&mods)
+    let matching_releases: Vec<_> = get_flat_releases(&mods)
         .into_iter()
         .filter(|(_, version)| version.match_constraints(&c))
         .collect();
