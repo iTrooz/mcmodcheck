@@ -9,7 +9,7 @@ fn parse_version(value: serde_json::Value) -> anyhow::Result<ModRelease> {
     })
 }
 
-pub fn check_versions(m: &Mod) -> anyhow::Result<Vec<ModRelease>> {
+pub fn check_releases(m: &Mod) -> anyhow::Result<Vec<ModRelease>> {
     let url = format!("https://api.modrinth.com/v2/project/{}/version", m.name);
     let body = reqwest::blocking::get(&url)?.text()?;
     let versions: Vec<serde_json::Value> = serde_json::from_str(&body)?;

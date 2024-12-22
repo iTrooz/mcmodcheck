@@ -1,4 +1,5 @@
 use clap::Parser;
+use types::{Constraints, ModAndReleases};
 
 use crate::types::ModType;
 use std::error::Error;
@@ -40,11 +41,32 @@ fn main() -> Result<(), Box<dyn Error>> {
 
     let mods = parse_mods(&cli.src)?;
 
-    for mod_item in mods {
-        match modrinth::check_versions(&mod_item) {
-            Ok(versions) => log::info!("Versions for mod '{}': {:?}", mod_item.name, versions),
-            Err(e) => log::error!("Error checking versions for {}: {}", mod_item.name, e),
-        }
+    let mods_releases: Vec<ModAndReleases> = mods
+        .iter()
+        .filter_map(|m| match modrinth::check_releases(m) {
+            Ok(releases) => Some(ModAndReleases {
+                mod_item: m.clone(),
+                releases,
+            }),
+            Err(e) => {
+                log::error!("Error checking versions for {}: {}", m.name, e);
+                None
+            }
+        })
+        .collect();
+
+    let c = Constraints {
+        min_mc_version: cli.min_version,
+        exact_mc_version: cli.exact_version,
+        loader: cli.loader,
+    };
+
+    let best_mc_version = logic::find_best_mc_version(mods_releases, c);
+    if let Some(mc_version) = best_mc_version {
+        println!("Best MC version: {}", mc_version.str);
+    } else {
+        println!("No matching MC version found");
     }
+
     Ok(())
 }
