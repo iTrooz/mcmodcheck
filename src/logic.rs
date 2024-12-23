@@ -35,6 +35,8 @@ pub fn find_best_mc_version(mods: Vec<ModAndReleases>, c: Constraints) -> Option
         let matching_mods = matching_releases
             .iter()
             .filter(|(_, release)| release.mc_versions.contains(&mc_version))
+            .map(|(m, _)| m)
+            .unique()
             .count();
         if matching_mods == mods.len() {
             return Some(mc_version.clone());

@@ -1,12 +1,12 @@
 /// Where the mod comes from
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub enum ModType {
     ForgeModType,
     ModrinthModType,
 }
 
 /// Represents metadata about a mod
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Hash)]
 pub struct Mod {
     pub name: String,
     pub mod_type: ModType,
